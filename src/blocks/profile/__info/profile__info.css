@@ -1,0 +1,15 @@
+.profile__info {
+  max-width: 336px;
+  display: flex;
+  flex-direction: column;
+}
+@media (max-width: 830px) {
+  .profile__info {
+    margin-bottom: 32px;
+  }
+}
+@media (max-width: 500px) {
+  .profile__info {
+    max-width: 270px;
+  }
+}

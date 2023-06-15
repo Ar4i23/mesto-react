@@ -1,0 +1,45 @@
+.profile__image-ellipse {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  margin-right: 30px;
+  background-size: cover;
+}
+
+.profile__image-ellipse::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000000;
+  background-image: url('../../../images/pen.svg');
+  background-position: center;
+  background-size: 26px;
+  background-repeat: no-repeat;
+  opacity: 0;
+}
+
+.profile__image-ellipse:hover::before {
+  opacity: 0.8;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+@media (max-width: 830px) {
+  .profile__image-ellipse {
+    margin-right: 0;
+  }
+}
+@media (max-width: 500px) {
+  .profile__image-ellipse {
+    margin-bottom: 35px;
+  }
+}
+@media (max-width: 320px) {
+  .profile__image-ellipse {
+    margin-bottom: 29px;
+  }
+}

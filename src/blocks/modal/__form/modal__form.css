@@ -1,0 +1,8 @@
+.modal__form {
+  margin-top: 42px;
+}
+@media (max-width: 340px) {
+  .modal__form {
+    margin-top: 70px;
+  }
+}

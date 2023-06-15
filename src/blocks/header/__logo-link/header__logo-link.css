@@ -1,0 +1,22 @@
+.header__logo-link {
+  margin-top: 45px;
+  margin-bottom: 42px;
+  display: block;
+  color: #fff;
+}
+.header__logo-link:hover {
+  opacity: 0.6;
+}
+@media (max-width: 830px) {
+  .header__logo-link {
+    margin-left: 60px;
+  }
+}
+@media (max-width: 500px) {
+  .header__logo-link {
+    max-width: 103px;
+    margin-left: 30px;
+    margin-top: 25px;
+    margin-bottom: 22px;
+  }
+}

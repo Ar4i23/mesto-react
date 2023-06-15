@@ -1,0 +1,20 @@
+.header {
+  max-width: 880px;
+  margin: 0 auto 40px;
+  border-bottom: 1px solid rgb(84, 84, 84, 0.7);
+}
+@media (max-width: 1000px) {
+  .header {
+    width: calc(100% - 60px * 2);
+  }
+}
+@media (max-width: 830px) {
+  .header {
+    width: 100%;
+  }
+}
+@media (max-width: 500px) {
+  .header {
+    margin: 0px auto 40px;
+  }
+}

@@ -1,0 +1,10 @@
+.element__button-like_active {
+  width: 22px;
+  height: 19px;
+  border: none;
+  padding: 0;
+  margin-right: 20px;
+  background: transparent;
+  background-image: url('../../../../images/like-active.svg');
+  cursor: pointer;
+}

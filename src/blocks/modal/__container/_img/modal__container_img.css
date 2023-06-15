@@ -1,0 +1,7 @@
+.modal__container_img {
+  width: 75vw;
+  height: 75vh;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}

@@ -1,0 +1,29 @@
+.profile__add-botton {
+  min-width: 150px;
+  height: 50px;
+  padding: 0;
+  border: 2px solid white;
+  background-color: #000;
+  background-image: url(../../../images/plus-sign.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.profile__add-botton:hover {
+  opacity: 0.6;
+}
+@media (max-width: 830px) {
+  .profile__add-botton {
+    max-width: 700px;
+    width: 100%;
+    position: static;
+  }
+}
+@media (max-width: 830px) {
+  .profile__add-botton {
+    background-size: 16px;
+  }
+}
