@@ -1,30 +1,48 @@
 import React from "react";
-function PopupWithForm({ name, title, children, isOpen, onClose, buttonText }) {
+
+const PopupWithForm = ({
+  isOpen,
+  isSending,
+  onClose,
+  onSubmit,
+  isValid = true,
+  ...rest
+}) => {
   return (
     <>
       <section
         className={`modal ${isOpen === true ? "modal_opened" : ""}`}
-        id={name}
-        onClick={(evt) => {
-          onClose(evt);
-        }}
+        id={rest.name}
+        onClick={onClose}
       >
-        <div className="modal__container">
+        <div className="modal__container" onClick={(e) => e.stopPropagation()}>
           <button
+            onClick={onClose}
             className="modal__close"
             id="close-edit"
             type="button"
           ></button>
-          <h2 className="modal__title">{title}</h2>
-          <form className="modal__form" name={name} noValidate>
-            {children}
-            <button className="modal__button" type="submit">
-              {buttonText}
+          <h2 className="modal__title">{rest.title}</h2>
+          <form
+            onSubmit={onSubmit}
+            className="modal__form"
+            name={rest.name}
+            noValidate
+          >
+            {rest.children}
+            <button
+              className={`modal__button  ${
+                isValid ? "" : "modal__button_invalid"
+              } `}
+              type={rest.type}
+              disabled={isSending}
+            >
+              {isSending ? rest.isSendingText : rest.buttonText}
             </button>
           </form>
         </div>
       </section>
     </>
   );
-}
+};
 export default PopupWithForm;

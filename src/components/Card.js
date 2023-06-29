@@ -1,30 +1,44 @@
-import React from "react";
-function Card({ src, name, lengthLike, onCardClick }) {
+import React, { useContext } from "react";
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
+import ButtonLike from "./ButtonLike";
+
+const Card = ({ onCardClick, onCardDelete, card }) => {
+  const currentUser = useContext(CurrentUserContext);
+
+  const handleClickImg = () => {
+    onCardClick(card);
+  };
+
+  const handleDeleteCard = () => {
+    onCardDelete(card);
+  };
+
   return (
     <>
       <article className="element">
-        <button className="element__button-delete"></button>
+        {currentUser._id === card.owner._id && (
+          <button
+            onClick={handleDeleteCard}
+            className="element__button-delete"
+          ></button>
+        )}
+
         <img
           className="element__image"
-          src={src}
-          alt={name}
-          onClick={() => {
-            onCardClick(src, name);
-          }}
+          src={card.link}
+          alt={card.name}
+          onClick={handleClickImg}
         />
         <div className="element__group">
-          <h2 className="element__title">{name}</h2>
-          <div className="element__box">
-            <button
-              className="element__button-like"
-              type="button"
-              aria-label="Кнопка лайк"
-            ></button>
-            <p className="element__counter-like">{lengthLike}</p>
-          </div>
+          <h2 className="element__title">{card.name}</h2>
+          <ButtonLike
+            likes={card.likes}
+            myId={currentUser._id}
+            cardId={card._id}
+          />
         </div>
       </article>
     </>
   );
-}
+};
 export default Card;

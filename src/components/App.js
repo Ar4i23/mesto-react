@@ -1,129 +1,218 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Header from "./Header";
 import Main from "./Main";
 import Footer from "./Footer";
-import PopupWithForm from "./PopupWithForm";
 import ImagePopup from "./ImagePopup";
+import api from "../utils/Api";
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
+import { CurrentCardContext } from "../contexts/CurrentCardContext";
+import EditProfilePopup from "./EditProfilePopup";
+import EditAvatarPopup from "./EditAvatarPopup";
+import AddPlacePopup from "./AddPlasePopup";
+import DeletePupup from "./DeletePopup";
 
-function App() {
-  const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState("");
-  const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState("");
-  const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState("");
-  const [selectedCard, setSelectedCard] = useState(false);
-  function closeAllPopups(evt) {
-    if (
-      evt.target.className === "modal modal_opened" ||
-      evt.target.className === "modal__close"
-    ) {
-      setIsAddPlacePopupOpen(false);
-      setSelectedCard(false);
-      setIsEditProfilePopupOpen(false);
-      setIsEditAvatarPopupOpen(false);
-    }
-  }
-  function handleCardClick(src, name) {
-    setSelectedCard({ isOpen: true, src, name });
-  }
+const App = () => {
+  // states pupup's
+  const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
+  const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
+  const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
+  const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
+  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
+  const [selectedCard, setSelectedCard] = useState({});
+  const [isSending, setIsSending] = useState(false);
+  // state context
+  const [currentUser, setCurrentUser] = useState({});
+  // state cards
+  const [cards, setCards] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [deleteCardId, setDeleteCardId] = useState({});
+  // log("hello");
+
+  // установка false всех pupup's
+  const closeAllPopups = useCallback(() => {
+    setIsAddPlacePopupOpen(false);
+    setIsImagePopupOpen(false);
+    setIsEditProfilePopupOpen(false);
+    setIsEditAvatarPopupOpen(false);
+    setIsDeletePopupOpen(false);
+  }, []);
+
+  // закрытие pupup's на Esc и снятие влушателя keydown
+  const closePopupByEsc = useCallback(
+    (evt) => {
+      if (evt.key === "Escape") {
+        closeAllPopups();
+        document.removeEventListener("keydown", closePopupByEsc);
+      }
+    },
+    [closeAllPopups]
+  );
+
+  // самая главная функция закрытия pupup's
+  const handleClosePopup = useCallback(() => {
+    closeAllPopups();
+    document.removeEventListener("keydown", closePopupByEsc);
+  }, [closePopupByEsc, closeAllPopups]);
+
+  // обработчик события keydown
+  const setEvtLisenersForDoc = () => {
+    document.addEventListener("keydown", closePopupByEsc);
+  };
+
+  // запрос информации user'а and cards с сервера
+  useEffect(() => {
+    setIsLoading(true);
+    Promise.all([api.getUserInfo(), api.getCards()])
+      .then(([dataUser, dataCards]) => {
+        setCurrentUser(dataUser);
+        setCards(dataCards);
+        setIsLoading(false);
+      })
+      .catch((err) => console.error(`Ошибка при загрузки данных: ${err}`));
+  }, []);
+
+  // обработчик  удаления карточки на сервере и из UI
+  const handleCardDelete = () => {
+    setIsSending(true);
+    api
+      .deleteCardByServer(deleteCardId)
+      .then(() => {
+        setCards(
+          cards.filter((c) => {
+            return c._id !== deleteCardId._id;
+          })
+        );
+        handleClosePopup();
+        setIsSending(false);
+      })
+      .catch((err) => console.error(`Ошибка при удалении карточки: ${err}`))
+      .finally(() => setIsSending(false));
+  };
+
+  // обработчик изменения информации user'а на сервере и в UI
+  const handleUpdateUser = (data, hendleClose) => {
+    setIsSending(true);
+    api
+      .setUserInfo(data)
+      .then((res) => {
+        setCurrentUser(res);
+        hendleClose();
+        setIsSending(false);
+      })
+      .catch((err) =>
+        console.error(`Ошибка при изменении данных профиля: ${err}`)
+      )
+      .finally(() => setIsSending(false));
+  };
+
+  // обработчик изменений аватакки user'а на сервере и в UI
+  const handleUpdateAvatar = (data, hendleClose) => {
+    setIsSending(true);
+    api
+      .setUserAvatar(data)
+      .then((res) => {
+        setCurrentUser(res);
+        hendleClose();
+        setIsSending(false);
+      })
+      .catch((err) => console.error(`Ошибка при изменении аватарки: ${err}`))
+      .finally(() => setIsSending(false));
+  };
+
+  // обработчик добавления новой card  на сервере и в UI
+  const handleAddPlaceSubmit = (data, hendleClose) => {
+    setIsSending(true);
+    api.addCardByServer(data).then((newCard) => {
+      setCards([newCard, ...cards]);
+      hendleClose();
+      setIsSending(false);
+    });
+  };
+
+  // обработчик нажатия на card и открытие pupupImage
+  // c навешиванием слушателя
+  const handleCardClick = (data) => {
+    setEvtLisenersForDoc();
+    setSelectedCard(data);
+    setIsImagePopupOpen(true);
+  };
+
+  // обработчик нажатия на кнопку дабавления новой card
+  // c навешиванием слушателя
+  const handleAddPlacePopup = () => {
+    setIsAddPlacePopupOpen(true);
+    setEvtLisenersForDoc();
+  };
+  // обработчик нажатия на кнопку редактирования аватарки
+  // c навешиванием слушателя
+  const handleEditAvatarPopup = () => {
+    setIsEditAvatarPopupOpen(true);
+    setEvtLisenersForDoc();
+  };
+  // обработчик нажатия на кнопку редактирования профиля
+  // c навешиванием слушателя
+  const handleEditProfilePopup = () => {
+    setIsEditProfilePopupOpen(true);
+    setEvtLisenersForDoc();
+  };
+  // обработчик нажатия на иконку удаления
+  // c навешиванием слушателя
+  const handleDeletePlace = (card) => {
+    setDeleteCardId(card);
+    setEvtLisenersForDoc();
+    setIsDeletePopupOpen(true);
+  };
 
   return (
     <div>
-      <Header />
-      <Main
-        onCardClick={handleCardClick}
-        onAddPlace={() => setIsAddPlacePopupOpen(true)}
-        onEditAvatar={() => setIsEditAvatarPopupOpen(true)}
-        onEditProfile={() => setIsEditProfilePopupOpen(true)}
-      />
-      <Footer />
-      <PopupWithForm
-        name="my-modal-avatar"
-        title="Обновить аватар"
-        isOpen={isEditAvatarPopupOpen}
-        onClose={closeAllPopups}
-        buttonText={"Сохранить"}
-      >
-        <input
-          id="link-avatar"
-          name="avatar"
-          type="url"
-          className="modal__input modal__input_linking"
-          placeholder="Ссылка на картинку"
-          required
+      <CurrentUserContext.Provider value={currentUser}>
+        <Header />
+        <CurrentCardContext.Provider value={cards}>
+          <Main
+            onCardDelete={handleDeletePlace}
+            onCardClick={handleCardClick}
+            onAddPlace={handleAddPlacePopup}
+            onEditAvatar={handleEditAvatarPopup}
+            onEditProfile={handleEditProfilePopup}
+            isLoading={isLoading}
+            cards={cards}
+          />
+        </CurrentCardContext.Provider>
+        <Footer />
+
+        <EditProfilePopup
+          onUpdateUser={handleUpdateUser}
+          onClose={handleClosePopup}
+          isOpen={isEditProfilePopupOpen}
+          isSending={isSending}
         />
-        <span className="modal__error" id="link-avatar-error"></span>
-      </PopupWithForm>
-      <PopupWithForm
-        name="my-modal-edit"
-        title="Редактировать профиль"
-        isOpen={isEditProfilePopupOpen}
-        onClose={closeAllPopups}
-        buttonText={"Сохранить"}
-      >
-        <input
-          id="name-edit"
-          name="name"
-          type="text"
-          className="modal__input modal__input_modal_name"
-          placeholder="Имя"
-          required
-          minLength="2"
-          maxLength="40"
+        <EditAvatarPopup
+          onUpdateAvatar={handleUpdateAvatar}
+          onClose={handleClosePopup}
+          isOpen={isEditAvatarPopupOpen}
+          isSending={isSending}
         />
-        <span className="modal__error" id="name-edit-error"></span>
-        <input
-          id="about-edit"
-          name="about"
-          type="text"
-          className="modal__input modal__input_modal_about"
-          placeholder="Обо мне"
-          required
-          minLength="2"
-          maxLength="200"
+        <AddPlacePopup
+          onAddPlace={handleAddPlaceSubmit}
+          onClose={handleClosePopup}
+          isOpen={isAddPlacePopupOpen}
+          isSending={isSending}
         />
-        <span className="modal__error" id="about-edit-error"></span>
-      </PopupWithForm>
-      <PopupWithForm
-        name="my-modal-cread"
-        title="Новое место"
-        isOpen={isAddPlacePopupOpen}
-        onClose={closeAllPopups}
-        buttonText={"Сохранить"}
-      >
-        <input
-          id="name-cread"
-          name="name"
-          type="text"
-          className="modal__input modal__input_naming"
-          placeholder="Название картинки"
-          required
-          minLength="2"
-          maxLength="30"
+        <DeletePupup
+          onDeletePlace={handleCardDelete}
+          onClose={handleClosePopup}
+          isOpen={isDeletePopupOpen}
+          isSending={isSending}
         />
-        <span className="modal__error" id="name-cread-error"></span>
-        <input
-          id="link-cread"
-          name="link"
-          type="url"
-          className="modal__input modal__input_linking"
-          placeholder="Ссылка на картинку"
-          required
+
+        <ImagePopup
+          isOpen={isImagePopupOpen}
+          card={selectedCard}
+          onClose={handleClosePopup}
         />
-        <span className="modal__error" id="link-cread-error"></span>
-      </PopupWithForm>
-      <PopupWithForm
-        name="my-modal-delete"
-        title="Вы уверены?"
-        buttonText={"Да"}
-      >
-        <button
-          className="modal__close"
-          id="close-delete"
-          type="button"
-        ></button>
-      </PopupWithForm>
-      <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+      </CurrentUserContext.Provider>
     </div>
   );
-}
+};
 
 export default App;

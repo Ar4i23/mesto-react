@@ -1,6 +1,6 @@
 import React from "react";
 import logo from "../images/logo.svg";
-function Header() {
+const Header = () => {
   return (
     <>
       <header className="header">
@@ -10,5 +10,5 @@ function Header() {
       </header>
     </>
   );
-}
+};
 export default Header;

@@ -5,6 +5,6 @@
   padding: 0;
   margin-right: 20px;
   background: transparent;
-  background-image: url('../../../../images/like-active.svg');
+  background-image: url("../../../../images/like-active.svg");
   cursor: pointer;
 }
