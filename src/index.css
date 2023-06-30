@@ -16,8 +16,6 @@
 @import url(./blocks/elements/elements.css);
 @import url(./blocks/element-spinner/element-spinner.css);
 @import url(./blocks/element/element.css);
-@import url(./blocks/element/__box/element__box.css);
-@import url(./blocks/element/__link/element__link.css);
 @import url(./blocks/element/__counter-like/element__counter-like.css);
 @import url(./blocks/element/__button-delete/element__button-delete.css);
 @import url(./blocks/element/__button-delete/_hidden/element__button-delete_hidden.css);
@@ -30,7 +28,6 @@
 @import url(./blocks/modal/modal.css);
 @import url(./blocks/modal/__error/modal__error.css);
 @import url(./blocks/modal/__img/modal__img.css);
-@import url(./blocks/modal//__heading/modal__heading.css);
 @import url(./blocks/modal/_opened/modal_opened.css);
 @import url(./blocks/modal/__button/modal__button.css);
 @import url(./blocks/modal/__button/_invalid/modal__button_invalid.css);
@@ -40,8 +37,6 @@
 @import url(./blocks/modal/__input/modal__input.css);
 @import url(./blocks/modal/__input/_error/modal__input_error.css);
 @import url(./blocks/modal/__title/modal__title.css);
-@import url(./blocks/modal/__title/_avatar/modal__title_avatar.css);
-@import url(./blocks/modal/__title/_delete/modal__title_delete.css);
 @import url(./blocks/modal/__form/modal__form.css);
 @import url(./blocks/footer/footer.css);
 @import url(./blocks/footer/__text/footer__text.css);
