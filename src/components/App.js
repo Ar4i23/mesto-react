@@ -5,7 +5,6 @@ import Footer from "./Footer";
 import ImagePopup from "./ImagePopup";
 import api from "../utils/Api";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
-import { CurrentCardContext } from "../contexts/CurrentCardContext";
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlasePopup";
@@ -122,11 +121,16 @@ const App = () => {
   // обработчик добавления новой card  на сервере и в UI
   const handleAddPlaceSubmit = (data, hendleClose) => {
     setIsSending(true);
-    api.addCardByServer(data).then((newCard) => {
-      setCards([newCard, ...cards]);
-      hendleClose();
-      setIsSending(false);
-    });
+    api
+      .addCardByServer(data)
+      .then((newCard) => {
+        setCards([newCard, ...cards]);
+        hendleClose();
+      })
+      .catch((err) =>
+        console.error(`Ошибка при добавлении нового места: ${err}`)
+      )
+      .finally(() => setIsSending(false));
   };
 
   // обработчик нажатия на card и открытие pupupImage
@@ -167,17 +171,15 @@ const App = () => {
     <div>
       <CurrentUserContext.Provider value={currentUser}>
         <Header />
-        <CurrentCardContext.Provider value={cards}>
-          <Main
-            onCardDelete={handleDeletePlace}
-            onCardClick={handleCardClick}
-            onAddPlace={handleAddPlacePopup}
-            onEditAvatar={handleEditAvatarPopup}
-            onEditProfile={handleEditProfilePopup}
-            isLoading={isLoading}
-            cards={cards}
-          />
-        </CurrentCardContext.Provider>
+        <Main
+          onCardDelete={handleDeletePlace}
+          onCardClick={handleCardClick}
+          onAddPlace={handleAddPlacePopup}
+          onEditAvatar={handleEditAvatarPopup}
+          onEditProfile={handleEditProfilePopup}
+          isLoading={isLoading}
+          cards={cards}
+        />
         <Footer />
 
         <EditProfilePopup
