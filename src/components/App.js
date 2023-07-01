@@ -36,27 +36,23 @@ const App = () => {
     setIsDeletePopupOpen(false);
   }, []);
 
-  // закрытие pupup's на Esc и снятие влушателя keydown
-  const closePopupByEsc = useCallback(
-    (evt) => {
-      if (evt.key === "Escape") {
-        closeAllPopups();
-        document.removeEventListener("keydown", closePopupByEsc);
-      }
-    },
-    [closeAllPopups]
-  );
-
   // самая главная функция закрытия pupup's
   const handleClosePopup = useCallback(() => {
     closeAllPopups();
-    document.removeEventListener("keydown", closePopupByEsc);
-  }, [closePopupByEsc, closeAllPopups]);
+  }, [closeAllPopups]);
 
-  // обработчик события keydown
-  const setEvtLisenersForDoc = () => {
+  useEffect(() => {
+    const closePopupByEsc = (evt) => {
+      if (evt.key === "Escape") {
+        closeAllPopups();
+      }
+    };
+
     document.addEventListener("keydown", closePopupByEsc);
-  };
+    return () => {
+      document.removeEventListener("keydown", closePopupByEsc);
+    };
+  }, []);
 
   // запрос информации user'а and cards с сервера
   useEffect(() => {
@@ -112,7 +108,6 @@ const App = () => {
       .then((res) => {
         setCurrentUser(res);
         hendleClose();
-        setIsSending(false);
       })
       .catch((err) => console.error(`Ошибка при изменении аватарки: ${err}`))
       .finally(() => setIsSending(false));
@@ -134,36 +129,26 @@ const App = () => {
   };
 
   // обработчик нажатия на card и открытие pupupImage
-  // c навешиванием слушателя
   const handleCardClick = (data) => {
-    setEvtLisenersForDoc();
     setSelectedCard(data);
     setIsImagePopupOpen(true);
   };
 
   // обработчик нажатия на кнопку дабавления новой card
-  // c навешиванием слушателя
   const handleAddPlacePopup = () => {
     setIsAddPlacePopupOpen(true);
-    setEvtLisenersForDoc();
   };
   // обработчик нажатия на кнопку редактирования аватарки
-  // c навешиванием слушателя
   const handleEditAvatarPopup = () => {
     setIsEditAvatarPopupOpen(true);
-    setEvtLisenersForDoc();
   };
   // обработчик нажатия на кнопку редактирования профиля
-  // c навешиванием слушателя
   const handleEditProfilePopup = () => {
     setIsEditProfilePopupOpen(true);
-    setEvtLisenersForDoc();
   };
   // обработчик нажатия на иконку удаления
-  // c навешиванием слушателя
   const handleDeletePlace = (card) => {
     setDeleteCardId(card);
-    setEvtLisenersForDoc();
     setIsDeletePopupOpen(true);
   };
 
