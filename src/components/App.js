@@ -1,14 +1,19 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Header from "./Header";
 import Main from "./Main";
+import Layout from "./Layout";
 import Footer from "./Footer";
+import ProtectedRoute from "./ProtectedRoute";
 import ImagePopup from "./ImagePopup";
-import api from "../utils/Api";
-import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlasePopup";
 import DeletePupup from "./DeletePopup";
+import InfoTooltip from "./InfoTooltip";
+import api from "../utils/Api";
+import apiAuth from "../utils/ApiAuth";
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
 
 const App = () => {
   // states pupup's
@@ -17,15 +22,30 @@ const App = () => {
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
-  const [selectedCard, setSelectedCard] = useState({});
+
+  // state для Tooltip
+  const [isResultPopupOpen, setIsResultPopupOpen] = useState(false);
+  const [successful, setSuccessful] = useState(false);
+
+  // state для отрисовки отправки данных на сервер и показания ожидания
   const [isSending, setIsSending] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
   // state context
   const [currentUser, setCurrentUser] = useState({});
+
+  // state для информации email user'а
+  const [userEmail, setUserEmail] = useState("");
+
   // state cards
+  const [selectedCard, setSelectedCard] = useState({});
   const [cards, setCards] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [deleteCardId, setDeleteCardId] = useState({});
-  // log("hello");
+
+  // state для авторизации
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  const navigate = useNavigate();
 
   // установка false всех pupup's
   const closeAllPopups = useCallback(() => {
@@ -34,6 +54,7 @@ const App = () => {
     setIsEditProfilePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
     setIsDeletePopupOpen(false);
+    setIsResultPopupOpen(false);
   }, []);
 
   // самая главная функция закрытия pupup's
@@ -53,6 +74,46 @@ const App = () => {
       document.removeEventListener("keydown", closePopupByEsc);
     };
   }, []);
+  // обработчик Регистрации
+  const handleRegister = (data, resetInput) => {
+    setIsSending(true);
+    apiAuth
+      .signup(data)
+      .then(() => {
+        setIsResultPopupOpen(true);
+        setSuccessful(true);
+        resetInput();
+        navigate("/sign-in");
+      })
+      .catch((err) => {
+        setIsResultPopupOpen(true);
+        setSuccessful(false);
+        console.error(`Ошибка при регистрации: ${err}`);
+      })
+      .finally(() => {
+        setIsSending(false);
+      });
+  };
+  // обработчик Входа
+  const handleLogin = (data, resetInput) => {
+    setIsSending(true);
+    apiAuth
+      .signin(data)
+      .then((data) => {
+        localStorage.setItem("token", data.token);
+        resetInput();
+        setLoggedIn(true);
+        navigate("/");
+      })
+      .catch((err) => {
+        setIsResultPopupOpen(true);
+        setSuccessful(false);
+        console.error(`Ошибка при авторизации: ${err}`);
+      })
+      .finally(() => {
+        setIsSending(false);
+      });
+  };
 
   // запрос информации user'а and cards с сервера
   useEffect(() => {
@@ -65,6 +126,24 @@ const App = () => {
       })
       .catch((err) => console.error(`Ошибка при загрузки данных: ${err}`));
   }, []);
+
+  // запрос на повторный вход
+  useEffect(() => {
+    if (localStorage.token) {
+      apiAuth
+        .getUsersMe(localStorage.token)
+        .then((res) => {
+          setUserEmail(res.data.email);
+          setLoggedIn(true);
+          navigate("/");
+        })
+        .catch((err) => {
+          console.error(`Ошибка при повторном входе:${err}`);
+        });
+    } else {
+      setLoggedIn(false);
+    }
+  }, [navigate]);
 
   // обработчик  удаления карточки на сервере и из UI
   const handleCardDelete = () => {
@@ -155,16 +234,55 @@ const App = () => {
   return (
     <div>
       <CurrentUserContext.Provider value={currentUser}>
-        <Header />
-        <Main
-          onCardDelete={handleDeletePlace}
-          onCardClick={handleCardClick}
-          onAddPlace={handleAddPlacePopup}
-          onEditAvatar={handleEditAvatarPopup}
-          onEditProfile={handleEditProfilePopup}
-          isLoading={isLoading}
-          cards={cards}
-        />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute
+                element={Layout}
+                onCardDelete={handleDeletePlace}
+                onCardClick={handleCardClick}
+                onAddPlace={handleAddPlacePopup}
+                onEditAvatar={handleEditAvatarPopup}
+                onEditProfile={handleEditProfilePopup}
+                isLoading={isLoading}
+                isSending={isSending}
+                userEmail={userEmail}
+                loggedIn={loggedIn}
+                cards={cards}
+                name="main"
+                linkText="Выход"
+              />
+            }
+          />
+          <Route
+            path="sign-in"
+            element={
+              <>
+                <Header name="signin" linkText="Регистрация" />
+                <Main
+                  name="signin"
+                  isSending={isSending}
+                  onSubmit={handleLogin}
+                />
+              </>
+            }
+          />
+          <Route
+            path="sign-up"
+            element={
+              <>
+                <Header name="signup" linkText="Вход" />
+                <Main
+                  name="signup"
+                  isSending={isSending}
+                  onSubmit={handleRegister}
+                />
+              </>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
         <Footer />
 
         <EditProfilePopup
@@ -195,6 +313,11 @@ const App = () => {
         <ImagePopup
           isOpen={isImagePopupOpen}
           card={selectedCard}
+          onClose={handleClosePopup}
+        />
+        <InfoTooltip
+          isOpen={isResultPopupOpen}
+          successful={successful}
           onClose={handleClosePopup}
         />
       </CurrentUserContext.Provider>

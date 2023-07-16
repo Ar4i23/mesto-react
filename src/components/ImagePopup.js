@@ -9,7 +9,7 @@ const ImagePopup = ({ isOpen, card, onClose }) => {
         onClick={onClose}
       >
         <div
-          className="modal__container modal__container_img"
+          className="modal__container modal__container-img"
           onClick={(e) => e.stopPropagation()}
         >
           <button

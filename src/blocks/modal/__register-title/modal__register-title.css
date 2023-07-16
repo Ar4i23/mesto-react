@@ -1,0 +1,26 @@
+.modal__register-title {
+  margin: 0;
+  color: #000000;
+  text-align: center;
+  font-weight: 900;
+  font-size: 24px;
+  line-height: 29px;
+}
+@media (max-width: 830px) and (min-width: 500px) {
+  .modal__register-title {
+    font-size: 23px;
+    line-height: 26px;
+  }
+}
+@media (max-width: 500px) and (min-width: 400px) {
+  .modal__register-title {
+    font-size: 22px;
+    line-height: 24px;
+  }
+}
+@media (max-width: 400px) and (min-width: 320px) {
+  .modal__register-title {
+    font-size: 18px;
+    line-height: 22px;
+  }
+}

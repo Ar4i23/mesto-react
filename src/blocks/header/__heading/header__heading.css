@@ -1,0 +1,12 @@
+.header__heading {
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 22px;
+  color: #fff;
+  margin: 0;
+}
+@media (max-width: 830px) {
+  .header__heading {
+    margin-bottom: 10px;
+  }
+}

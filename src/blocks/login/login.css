@@ -1,0 +1,7 @@
+.login {
+  max-width: 880px;
+  display: flex;
+  margin: 60px auto 0;
+  flex-direction: column;
+  align-items: center;
+}

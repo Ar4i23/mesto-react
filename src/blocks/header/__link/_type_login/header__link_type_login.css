@@ -1,0 +1,10 @@
+@media (max-width: 830px) {
+  .header__link_type_login {
+    margin-right: 60px;
+  }
+}
+@media (max-width: 500px) {
+  .header__link_type_login {
+    margin-right: 30px;
+  }
+}

@@ -1,4 +1,5 @@
 import React from "react";
+import Form from "./Form";
 
 const PopupWithForm = ({
   isOpen,
@@ -23,23 +24,15 @@ const PopupWithForm = ({
             type="button"
           ></button>
           <h2 className="modal__title">{rest.title}</h2>
-          <form
+          <Form
+            children={rest.children}
+            buttonText={rest.buttonText}
+            isSending={isSending}
+            isSendingText={rest.isSendingText}
             onSubmit={onSubmit}
-            className="modal__form"
-            name={rest.name}
-            noValidate
-          >
-            {rest.children}
-            <button
-              className={`modal__button  ${
-                isValid ? "" : "modal__button_invalid"
-              } `}
-              type={rest.type}
-              disabled={isSending}
-            >
-              {isSending ? rest.isSendingText : rest.buttonText}
-            </button>
-          </form>
+            isValid={isValid}
+            type={rest.type}
+          />
         </div>
       </section>
     </>
