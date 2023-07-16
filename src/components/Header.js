@@ -13,9 +13,9 @@ const Header = ({ name, userEmail, linkText }) => {
   return (
     <>
       <header className={`header ${activeBurger ? "" : "header_opened"}`}>
-        <Link to="/" className="header__logo-link">
+        <a href="/" className="header__logo-link">
           <img className="header__img" src={logo} alt="Логотип Место" />
-        </Link>
+        </a>
         {name === "signup" ? (
           <Link to="/sign-in" className="header__link header__link_type_login">
             {linkText}
