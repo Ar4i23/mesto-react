@@ -10,8 +10,6 @@ const Form = ({
   onSubmit,
   isValid,
 }) => {
-  // console.log(isSendingText);
-  // console.log(isSending);
   return (
     <form onSubmit={onSubmit} className="login__form" name={name} noValidate>
       {children}
